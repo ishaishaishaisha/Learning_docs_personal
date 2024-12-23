@@ -1,0 +1,72 @@
+#get session stats in informatica - from INFA_REP schema in DB
+
+
+Select
+
+s
+
+.subj_name,
+
+wr
+
+.workflow_name,
+
+tir
+
+.INSTANCE_NAME as session_name,
+
+tir
+
+.START_TIME,
+
+tir
+
+.END_TIME,
+
+stl
+
+.SRC_SUCCESS_ROWS,
+
+stl
+
+.SRC_FAILED_ROWS,
+
+stl
+
+.TARG_SUCCESS_ROWS,
+
+stl
+
+.TARG_FAILED_ROWS,
+
+stl
+
+.FIRST_ERROR_MSG
+
+from
+
+opb_wflow_run wr inner Join opb_sess_task_log stl
+
+          on stl.WORKFLOW_ID = wr.WORKFLOW_ID
+
+          and stl.WORKFLOW_RUN_ID = wr.WORKFLOW_RUN_ID
+
+inner
+
+Join opb_task_inst_run tir
+
+          on tir.workflow_run_id = stl.workflow_run_id
+
+          and tir.instance_id = stl.instance_id
+
+          and tir.task_type = 68 -- Sessions only
+
+inner
+
+join opb_subject s
+
+          on wr.subject_id = s.subj_id
+
+where
+
+convert(char(10), wr.start_time, 112) = convert(char(10), getdate(), 112)
